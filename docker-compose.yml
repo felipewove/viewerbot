@@ -1,0 +1,11 @@
+version: '3'
+services:
+  viewer:
+    image: python:3.8
+    volumes:
+      - .:/home/
+    command: bash -c "
+      cd home
+      && pip install --upgrade pip
+      && pip install -r requirements.txt
+      && python threads_viewer.py"
