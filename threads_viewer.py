@@ -15,7 +15,7 @@ all_proxies = list()
 # Session creating for request
 ua = UserAgent()
 session = Streamlink()
-session.set_option("http-headers", f"User-Agent={ua.random};Client-ID=ewvlchtxgqq88ru9gmfp1gmyt6h2b93")
+session.set_option("http-headers", {'User-Agent': ua.random, "Client-ID": "ewvlchtxgqq88ru9gmfp1gmyt6h2b93"})
 
 
 def print_exception():
@@ -51,19 +51,21 @@ def open_url(proxy_data):
                         proxy_data['url'] = streams['audio_only'].url
                     except:
                         proxy_data['url'] = streams['worst'].url
-
-                    try:
-                        if time.time() - proxy_data['time'] >= random.randint(1, 5):
-                            current_proxy = {"http": "http://"+proxy_data['proxy'], "https": "https://"+proxy_data['proxy']}
-                            with requests.Session() as request:
-                                response = request.head(proxy_data['url'], proxies=current_proxy, headers=headers)
-                            print(f"Sent HEAD request with {current_proxy['http']} | {response.status_code} | {response.request} | {response.headers}")
-                            proxy_data['time'] = time.time()
-                            all_proxies[current_index] = proxy_data
-                    except:
-                        print("************* Connection Error! *************", sys.exc_info()[0], sys.exc_info()[1], proxy_data)
+                else:
+                    return
             except:
                 print("************* Streamlink Error! *************", sys.exc_info()[0], sys.exc_info()[1])
+
+        try:
+            if time.time() - proxy_data['time'] >= random.randint(1, 5):
+                current_proxy = {"http": "http://"+proxy_data['proxy'], "https": "https://"+proxy_data['proxy']}
+                with requests.Session() as request:
+                    response = request.head(proxy_data['url'], proxies=current_proxy, headers=headers)
+                print(f"Sent HEAD request with {current_proxy['http']} | {response.status_code} | {response.request} | {response.headers}")
+                proxy_data['time'] = time.time()
+                all_proxies[current_index] = proxy_data
+        except:
+            print("************* Connection Error! *************", sys.exc_info()[0], sys.exc_info()[1], proxy_data)
     except (KeyboardInterrupt, SystemExit):
         sys.exit()
 
@@ -81,7 +83,6 @@ if __name__ == "__main__":
     # open_url(all_proxies[0])
     while True:
         try:
-            # for thread_id in range(0, max_nb_of_threads):
             for thread_id in range(0, len(all_proxies)-1):
                 threaded = Thread(
                     target=open_url,
