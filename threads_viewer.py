@@ -15,7 +15,14 @@ all_proxies = list()
 # Session creating for request
 ua = UserAgent()
 session = Streamlink()
-session.set_option("http-headers", {'User-Agent': ua.random, "Client-ID": "ewvlchtxgqq88ru9gmfp1gmyt6h2b93"})
+session.set_option(
+    "http-headers",
+    {
+        'User-Agent': ua.random,
+        "Client-ID": "ewvlchtxgqq88ru9gmfp1gmyt6h2b93",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+    }
+)
 
 
 def print_exception():
@@ -40,7 +47,10 @@ def get_proxies():
 def open_url(proxy_data):
     try:
         global all_proxies
-        headers = {'User-Agent': ua.random}
+        headers = {
+            'User-Agent': ua.random,
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+        }
         current_index = all_proxies.index(proxy_data)
 
         if not proxy_data['url']:
@@ -48,7 +58,7 @@ def open_url(proxy_data):
                 streams = session.streams("https://www.twitch.tv/felipewove")
                 if streams:
                     try:
-                        proxy_data['url'] = streams['audio_only'].url
+                        proxy_data['url'] = streams['480p'].url
                     except:
                         proxy_data['url'] = streams['worst'].url
                 else:
